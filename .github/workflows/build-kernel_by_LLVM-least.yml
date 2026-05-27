@@ -188,6 +188,11 @@ jobs:
     - name: Setup Configuration for Kernel
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+        # 修复 hwconf_manager.c 中的函数声明警告
+        sed -i 's/static char \*hw_item_dump()/static char *hw_item_dump(void)/g' arch/arm64/kernel/hwconf_manager.c
+        # 也可以尝试直接删除这个警告文件（如果不需要的话）
+        # rm -f arch/arm64/kernel/hwconf_manager.c
+        echo "已修复内核源码警告"
         # 在这里添加修复代码（在 if 判断之前）
         sed -i 's/CONFIG_CC_STACKPROTECTOR_STRONG=y/# CONFIG_CC_STACKPROTECTOR_STRONG is not set/g' arch/${{ env.ARCH }}/configs/${{ env.KERNEL_CONFIG }}
         if [ ${{ env.ADD_KPROBES_CONFIG }} = true ]; then
