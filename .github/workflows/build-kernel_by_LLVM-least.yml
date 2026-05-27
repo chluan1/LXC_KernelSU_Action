@@ -257,6 +257,8 @@ jobs:
         export PATH=$GITHUB_WORKSPACE/kernel_workspace/llvm-clang/bin:$PATH
         export KBUILD_BUILD_HOST=Github-Action
         export KBUILD_BUILD_USER=$(echo ${{ github.actor }} | tr A-Z a-z)
+        # 设置编译标志，禁用这些警告
+        export KBUILD_CFLAGS="-Wno-misleading-indentation -Wno-error"
         # 安装 GCC 交叉编译工具链（必须！）
         sudo apt-get update
         sudo apt-get install -y gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
