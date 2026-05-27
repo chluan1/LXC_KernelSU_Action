@@ -258,69 +258,32 @@ jobs:
         fi
         # 第一个 make 生成配置
         make -j$(nproc --all) \
-          CC=clang \
-          LD=ld.lld \
-          AR=llvm-ar \
-          NM=llvm-nm \
-          STRIP=llvm-strip \
-          OBJCOPY=llvm-objcopy \
-          OBJDUMP=llvm-objdump \
-          READELF=llvm-readelf \
-          AS=clang \
-          HOSTCC=clang \
-          HOSTCXX=clang++ \
-          HOSTAR=llvm-ar \
-          HOSTLD=ld.lld \
+          LLVM=1 \
+          LLVM_IAS=1 \
           O=out \
           ARCH=${{ env.ARCH }} \
-          CLANG_TRIPLE=aarch64-linux-gnu- \
           CROSS_COMPILE=aarch64-linux-gnu- \
           CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
           ${{ env.EXTRA_CMDS }} \
           ${{ env.KERNEL_CONFIG }}    
-        # 第二个 make 实际编译
-        if [ ${{ env.ENABLE_CCACHE }} = true ]; then
+        if [ "${{ env.ENABLE_CCACHE }}" = "true" ]; then
           make -j$(nproc --all) \
-             CC="ccache clang" \
-             LD=ld.lld \
-             AR=llvm-ar \
-             NM=llvm-nm \
-             STRIP=llvm-strip \
-             OBJCOPY=llvm-objcopy \
-             OBJDUMP=llvm-objdump \
-             READELF=llvm-readelf \
-             AS=clang \
-             HOSTCC=clang \
-             HOSTCXX=clang++ \
-             HOSTAR=llvm-ar \
-             HOSTLD=ld.lld \
-             O=out \
-             ARCH=${{ env.ARCH }} \
-             CLANG_TRIPLE=aarch64-linux-gnu- \
-             CROSS_COMPILE=aarch64-linux-gnu- \
-             CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-             ${{ env.EXTRA_CMDS }}
+          LLVM=1 \
+          LLVM_IAS=1 \
+          O=out \
+          ARCH=${{ env.ARCH }} \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+          ${{ env.EXTRA_CMDS }}
         else
           make -j$(nproc --all) \
-            CC=clang \
-            LD=ld.lld \
-            AR=llvm-ar \
-            NM=llvm-nm \
-            STRIP=llvm-strip \
-            OBJCOPY=llvm-objcopy \
-            OBJDUMP=llvm-objdump \
-            READELF=llvm-readelf \
-            AS=clang \
-            HOSTCC=clang \
-            HOSTCXX=clang++ \
-            HOSTAR=llvm-ar \
-            HOSTLD=ld.lld \
-            O=out \
-            ARCH=${{ env.ARCH }} \
-            CLANG_TRIPLE=aarch64-linux-gnu- \
-            CROSS_COMPILE=aarch64-linux-gnu- \
-            CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
-            ${{ env.EXTRA_CMDS }}
+          LLVM=1 \
+          LLVM_IAS=1 \
+          O=out \
+          ARCH=${{ env.ARCH }} \
+          CROSS_COMPILE=aarch64-linux-gnu- \
+          CROSS_COMPILE_ARM32=arm-linux-gnueabi- \
+          ${{ env.EXTRA_CMDS }}
         fi
 
     - name: Check a kernel output files
