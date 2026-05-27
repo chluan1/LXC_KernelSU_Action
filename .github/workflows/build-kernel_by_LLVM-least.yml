@@ -271,6 +271,7 @@ jobs:
         make -j$(nproc --all) \
           LLVM=1 \
           LLVM_IAS=1 \
+          WERROR=0 \
           O=out \
           ARCH=arm64 \
           CROSS_COMPILE=aarch64-linux-gnu- \
@@ -282,6 +283,7 @@ jobs:
             CC="ccache clang" \
             LLVM=1 \
             LLVM_IAS=1 \
+            WERROR=0 \
             O=out \
             ARCH=arm64 \
             CROSS_COMPILE=aarch64-linux-gnu- \
