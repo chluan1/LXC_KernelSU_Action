@@ -263,6 +263,8 @@ jobs:
     - name: Build kernel
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
+        # 完全清理输出目录
+        rm -rf out
         # 只使用 LLVM 路径，移除 binutils 路径避免冲突
         export PATH=$GITHUB_WORKSPACE/kernel_workspace/llvm-clang/bin:$PATH
         export KBUILD_BUILD_HOST=Github-Action
