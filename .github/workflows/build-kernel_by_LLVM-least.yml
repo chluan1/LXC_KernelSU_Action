@@ -166,25 +166,32 @@ jobs:
     - name: Download kernel source
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
+        # 浅克隆主仓库
         git clone ${{ env.KERNEL_SOURCE }} -b ${{ env.KERNEL_SOURCE_BRANCH }} android-kernel --depth=1
         cd android-kernel
     
-         # 方法1: 使用 git checkout 恢复 block 目录
-        echo "恢复 block 目录..."
+        # 关键修复：删除现有的 block 目录并用 git checkout 恢复
+        echo "修复 block 目录..."
+        rm -rf block
         git checkout HEAD -- block/
     
-        # 方法2: 如果 block 目录有问题，强制从 git 对象中恢复
-        # 先删除可能损坏的文件
-        rm -f block/Makefile
-        # 从 git 仓库中恢复
-        git show HEAD:block/Makefile > block/Makefile
+        # 如果上述命令失败（block 不在 HEAD 中），从远程获取
+        if [ ! -d "block" ] || [ ! -f "block/Makefile" ]; then
+           echo "block 目录缺失，从远程获取..."
+            git fetch --depth=1 origin ${{ env.KERNEL_SOURCE_BRANCH }}
+            git checkout origin/${{ env.KERNEL_SOURCE_BRANCH }} -- block/
+        fi
     
-        # 转换换行符
-        find block/ -name "Makefile" -exec sed -i 's/\r$//' {} \;
-    
-        echo "block/Makefile 已恢复"
-        # 显示前几行验证
-        head -n 5 block/Makefile
+        # 验证 Makefile 是否存在且格式正确
+        if [ -f block/Makefile ]; then
+            echo "block/Makefile 存在"
+            # 显示前5行用于调试
+            echo "=== block/Makefile 前5行 ==="
+            head -n 5 block/Makefile | cat -A
+        else
+            echo "错误: block/Makefile 仍然不存在！"
+            exit 1
+        fi
 
     - name: Download source boot image
       if: env.BUILD_BOOT_IMG == 'true'
