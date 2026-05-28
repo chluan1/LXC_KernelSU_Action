@@ -192,6 +192,11 @@ jobs:
         rm -f arch/arm64/kernel/hwconf_manager.c
         sed -i '/hwconf_manager/d' arch/arm64/kernel/Makefile
         echo "已移除 hwconf_manager"
+        # 修复 block/Makefile 中的 multiple target patterns 错误
+        # 检查是否有格式问题，删除可能存在的特殊字符
+        sed -i 's/\r$//' block/Makefile
+        # 如果文件有 BOM 头，也要移除
+        sed -i '1s/^\xEF\xBB\xBF//' block/Makefile
         # 在 block/Makefile 中禁用 blk-crypto.o 的错误
         echo "CFLAGS_blk-crypto.o := -Wno-error" >> block/Makefile
         # 在 drivers/md/Makefile 中禁用 dm.o 的错误
