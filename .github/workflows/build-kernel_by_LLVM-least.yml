@@ -167,10 +167,37 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
         git clone ${{ env.KERNEL_SOURCE }} -b ${{ env.KERNEL_SOURCE_BRANCH }} android-kernel --depth=1
-        # 从原始仓库重新下载 block/Makefile（绕过可能损坏的版本）
         cd android-kernel
-        curl -o block/Makefile https://raw.githubusercontent.com/MiCode/Xiaomi_Kernel_OpenSource/${{ env.KERNEL_SOURCE_BRANCH }}/block/Makefile
-        echo "已重新下载 block/Makefile"
+    
+        # 彻底修复所有 Makefile 文件
+        echo "正在修复所有 Makefile 文件..."
+    
+        # 方法1: 使用 git checkout 恢复原始 block 目录
+        # 删除 block 目录并重新从 git 检出（避免 curl 下载的问题）
+        rm -rf block
+        git checkout HEAD -- block/
+    
+        # 方法2: 如果上述方法不行，则使用 find 命令批量修复
+        # 将所有的 Makefile 转换为 Unix 格式
+        find . -name "Makefile" -type f -exec sed -i 's/\r$//' {} \;
+        find . -name "Makefile" -type f -exec sed -i '1s/^\xEF\xBB\xBF//' {} \;
+    
+        # 特别修复 block/Makefile
+        if [ -f block/Makefile ]; then
+            echo "特别修复 block/Makefile..."
+            sed -i 's/\r$//' block/Makefile
+            sed -i '1s/^\xEF\xBB\xBF//' block/Makefile
+            # 显示前几行用于调试
+            echo "=== block/Makefile 前5行 ==="
+            head -n 5 block/Makefile
+        else
+            echo "警告: block/Makefile 不存在！"
+            # 如果文件不存在，从原始仓库获取
+            curl -o block/Makefile https://raw.githubusercontent.com/MiCode/Xiaomi_Kernel_OpenSource/${{ env.KERNEL_SOURCE_BRANCH }}/block/Makefile
+            sed -i 's/\r$//' block/Makefile
+        fi
+    
+        echo "Makefile 修复完成"
 
     - name: Download source boot image
       if: env.BUILD_BOOT_IMG == 'true'
