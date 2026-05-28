@@ -167,6 +167,10 @@ jobs:
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
         git clone ${{ env.KERNEL_SOURCE }} -b ${{ env.KERNEL_SOURCE_BRANCH }} android-kernel --depth=1
+        # 从原始仓库重新下载 block/Makefile（绕过可能损坏的版本）
+        cd android-kernel
+        curl -o block/Makefile https://raw.githubusercontent.com/MiCode/Xiaomi_Kernel_OpenSource/${{ env.KERNEL_SOURCE_BRANCH }}/block/Makefile
+        echo "已重新下载 block/Makefile"
 
     - name: Download source boot image
       if: env.BUILD_BOOT_IMG == 'true'
