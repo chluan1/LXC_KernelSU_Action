@@ -188,12 +188,9 @@ jobs:
     - name: Setup Configuration for Kernel
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-        # 直接注释掉整个 hw_item_dump 函数
-        if [ -f arch/arm64/kernel/hwconf_manager.c ]; then
-          # 注释掉函数定义和相关调用
-          sed -i '212,216s/^/\/\//' arch/arm64/kernel/hwconf_manager.c
-          echo "已禁用 hwconf_manager.c 中的问题函数"
-        fi
+        # 删除有问题的 hwconf_manager.c 文件
+        rm -f arch/arm64/kernel/hwconf_manager.c
+        echo "已删除有问题的 hwconf_manager.c 文件"
         # 在 block/Makefile 中禁用 blk-crypto.o 的错误
         echo "CFLAGS_blk-crypto.o := -Wno-error" >> block/Makefile
         # 在 drivers/md/Makefile 中禁用 dm.o 的错误
